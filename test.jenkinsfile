@@ -24,13 +24,23 @@ pipeline {
                 sh 'docker build -t devops-pe/calculator-app:latest .'
             }
         }
-        stage('Push artifact') {
+        stage('Push Artifact') {
             steps {
                 script {
-                    // Login naar Docker Hub met de 'docker' credentials die je hebt opgeslagen in Jenkins
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker') {
-                        sh 'docker push devops-pe/calculator-app:latest'
+                    echo 'Logging in to Docker Hub...'
+
+                    // Docker login met credentials van Docker Hub
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                        sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USERNAME --password-stdin'
                     }
+
+                    echo 'Tagging and pushing Docker image...'
+
+                    // Tag de image met het Docker Hub profiel van je teamgenoot
+                    sh "docker tag devops-pe/calculator-app:latest $DOCKER_HUB_USERNAME/calculator-app:${BUILD_ID}"
+
+                    // Push de getagde image naar Docker Hub
+                    sh "docker push $DOCKER_HUB_USERNAME/calculator-app:${BUILD_ID}"
                 }
             }
         }
