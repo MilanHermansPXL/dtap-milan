@@ -40,9 +40,7 @@ pipeline {
 
                     echo "Tagging image with: ${imageTag}"
 
-                    sh "docker tag devops-pe/calculator-app:latest devops-pe/calculator-app:latest"
-
-                    
+                    sh "docker push ${imageTag}"
                 }
             }
         }
