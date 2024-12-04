@@ -40,8 +40,8 @@ pipeline {
         }
         stage('Push Artifact to DockerHub') {
             steps {
-                // Pusht de image naar de juiste repository (devops-pe)
-                sh 'docker push devops-pe:latest'
+                // Pusht de image naar de juiste repository (devops-pe/calculator-app)
+                sh 'docker push devops-pe/calculator-app:latest'
             }
         }
     }
