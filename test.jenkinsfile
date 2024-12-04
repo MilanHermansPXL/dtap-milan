@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        nodejs 'testenvnode'  // Specify your Node.js environment
+        nodejs 'testenvnode'
     }
     stages {
         stage('Cleanup') {
@@ -24,24 +24,10 @@ pipeline {
                 sh 'docker build -t devops-pe/calculator-app:latest .'
             }
         }
-        stage('Push Artifact to DockerHub') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
-                        // Login to DockerHub and push the image
-                        sh '''
-                            docker logout
-                            echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
-                            docker push devops-pe/calculator-app:latest
-                        '''
-                    }
-                }
-            }
-        }
     }
     post {
         always {
-            sh 'docker logout'  // Logout from DockerHub after the pipeline execution
+            sh 'docker logout'
         }
     }
 }
