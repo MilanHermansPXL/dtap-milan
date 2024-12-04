@@ -29,27 +29,23 @@ pipeline {
                 script {
                     echo 'Logging in to Docker Hub...'
 
-                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         echo 'Logging into Docker Hub with provided credentials...'
 
-                        // Zorg ervoor dat de omgevingsvariabelen beschikbaar zijn voor de Docker login opdracht
                         sh """
-                            echo \$DOCKER_HUB_PASSWORD | docker login -u \$DOCKER_HUB_USERNAME --password-stdin
+                            docker login -u ${USERNAME} --password-stdin <<< ${PASSWORD}
                         """
                     }
 
                     echo 'Tagging Docker image...'
-                    // Gebruik de environment variable direct in de shell-opdracht
-                    def imageTag = "${DOCKER_HUB_USERNAME}/calculator-app:latest"
+                    def imageTag = "${USERNAME}/calculator-app:latest"
                     echo "Tagging image with: ${imageTag}"
 
-                    // Tag de Docker image
                     sh """
                         docker tag devops-pe/calculator-app:latest ${imageTag}
                     """
 
                     echo 'Pushing Docker image to Docker Hub...'
-                    // Push de Docker image naar Docker Hub
                     sh """
                         docker push ${imageTag}
                     """
