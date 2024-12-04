@@ -29,7 +29,8 @@ pipeline {
         stage('Push artifact'){
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
-                            script {
+                    script {
+                        // Log in to Docker using Jenkins credentials
                         sh "echo \"$DOCKERHUB_PSW\" | docker login -u \"$DOCKERHUB_USR\" --password-stdin docker.io"
                         sh "docker push $DOCKERHUB_USR/devops-pe"
                     }
@@ -39,6 +40,7 @@ pipeline {
     }
     post {
         always {
+            // Log out from Docker after the build
             sh 'docker logout'
         }
     }
