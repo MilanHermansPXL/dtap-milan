@@ -28,7 +28,10 @@ pipeline {
         }
         stage('Push artifact'){
             steps{
-                echo 'hallo'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')])
+                sh '''
+                            docker login -u "$DOCKERHUB_USR" -p "$DOCKERHUB_PSW" docker.io
+                    '''
             }
         }
     }
