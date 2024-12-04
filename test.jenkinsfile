@@ -37,16 +37,16 @@ pipeline {
 
                     echo 'Tagging and pushing Docker image...'
 
-                    // De image tag correct instellen
+                    // Tag de image met de juiste repository en naam
                     def imageTag = "\$DOCKER_HUB_USERNAME/calculator-app:latest"
 
                     echo "Tagging image with: ${imageTag}"
 
-                    // Tag de image met de juiste naam en repository
-                    sh "docker tag devops-pe/calculator-app:latest devops-pe/calculator-app:latest"
+                    // Tag de image correct voor de Docker Hub repository
+                    sh "docker tag devops-pe/calculator-app:latest \$DOCKER_HUB_USERNAME/calculator-app:latest"
 
                     // Push de getagde image naar Docker Hub
-                    sh "docker push devops-pe/calculator-app:latest"
+                    sh "docker push \$DOCKER_HUB_USERNAME/calculator-app:latest"
                 }
             }
         }
