@@ -3,6 +3,9 @@ pipeline {
     tools {
         nodejs 'testenvnode'
     }
+    environment{
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
     stages {
         stage('cleanup') {
             steps {
@@ -27,29 +30,16 @@ pipeline {
         stage('Push Artifact') {
             steps {
                 script {
-                    echo 'Logging in to Docker Hub...'
-
-                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        echo 'Logging into Docker Hub with provided credentials...'
-
-                        sh """
-                            docker login -u ${USERNAME} --password-stdin <<< ${PASSWORD}
-                        """
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
+                        sh 'echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin'
+                        sh 'docker push devops-pe/calculator-app:latest'
                     }
-
-                    echo 'Tagging Docker image...'
-                    def imageTag = "${USERNAME}/calculator-app:latest"
-                    echo "Tagging image with: ${imageTag}"
-
-                    sh """
-                        docker tag devops-pe/calculator-app:latest ${imageTag}
-                    """
-
-                    echo 'Pushing Docker image to Docker Hub...'
-                    sh """
-                        docker push ${imageTag}
-                    """
                 }
+            }
+        }
+        post{
+            always{
+                sh 'docker logout'
             }
         }
     }
