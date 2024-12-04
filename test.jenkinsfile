@@ -29,23 +29,19 @@ pipeline {
                 script {
                     echo 'Logging in to Docker Hub...'
 
-                    // Docker login met credentials van Docker Hub
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                        // Inloggen in Docker Hub
+                        
                         sh "echo \$DOCKER_HUB_PASSWORD | docker login -u \$DOCKER_HUB_USERNAME --password-stdin"
                     }
 
                     echo 'Tagging and pushing Docker image...'
 
-                    // De image tag correct instellen
                     def imageTag = "\$DOCKER_HUB_USERNAME/calculator-app:latest"
 
                     echo "Tagging image with: ${imageTag}"
 
-                    // Tag de image met de juiste naam en repository
                     sh "docker tag devops-pe/calculator-app:latest devops-pe/calculator-app:latest"
 
-                    // Push de getagde image naar Docker Hub
                     sh "docker push devops-pe/calculator-app:latest"
                 }
             }
