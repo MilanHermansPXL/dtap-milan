@@ -14,11 +14,7 @@ pipeline {
                 sh "npm install express"
             }
         }
-        stage('Fetch app code') {
-            steps {
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
-            }
-        }
+        
         stage('Build artifact') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
@@ -30,10 +26,14 @@ pipeline {
             steps{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
                     script {
-                        sh "docker login -u \"$DOCKERHUB_USR\" -p \"$DOCKERHUB_PSW\" docker.io"
                         sh "docker push $DOCKERHUB_USR/devops-pe"
                     }
                 }
+            }
+        }
+        stage('Fetch app code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
         }
     }
