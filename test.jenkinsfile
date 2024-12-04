@@ -37,10 +37,10 @@ pipeline {
 
                     echo 'Tagging and pushing Docker image...'
 
-                    // Tag de image met het Docker Hub profiel van je teamgenoot
-                    sh "docker tag devops-pe/calculator-app:latest \$DOCKER_HUB_USERNAME/calculator-app"
+                    // Tag the image with the Docker Hub profile and unique BUILD_ID
+                    sh "docker tag devops-pe/calculator-app:latest \$DOCKER_HUB_USERNAME/calculator-app:${BUILD_ID}"
 
-                    // Push de getagde image naar Docker Hub
+                    // Push the tagged image to Docker Hub
                     sh "docker push \$DOCKER_HUB_USERNAME/calculator-app:${BUILD_ID}"
                 }
             }
