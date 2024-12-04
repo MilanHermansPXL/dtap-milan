@@ -3,8 +3,8 @@ pipeline {
     tools {
         nodejs 'testenvnode'
     }
-    environment{
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')  // Haal de credentials op
     }
     stages {
         stage('cleanup') {
@@ -30,6 +30,7 @@ pipeline {
         stage('Push Artifact') {
             steps {
                 script {
+                    // Gebruik 'withCredentials' om de Docker Hub inloggegevens veilig te verwerken
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
                         sh 'echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin'
                         sh 'docker push devops-pe/calculator-app:latest'
@@ -37,10 +38,10 @@ pipeline {
                 }
             }
         }
-        post{
-            always{
-                sh 'docker logout'
-            }
+    }
+    post {
+        always {
+            sh 'docker logout'
         }
     }
 }
