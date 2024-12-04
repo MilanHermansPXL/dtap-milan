@@ -1,47 +1,52 @@
 pipeline {
     agent any
     tools {
-        nodejs 'testenvnode'
+        nodejs 'testenvnode'  // Specificeer je Node.js omgeving
     }
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')  // Haal de credentials op
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')  // Haal de DockerHub inloggegevens op uit Jenkins credentials store
     }
     stages {
         stage('cleanup') {
             steps {
-                deleteDir()
+                deleteDir()  // Verwijder tijdelijke bestanden, als ze bestaan
             }
         }
         stage('Install dependencies') {
             steps {
-                sh "npm install express"
+                sh "npm install express"  // Installeer express afhankelijkheid
             }
         }
         stage('fetch app code') {
             steps {
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'  // Haal de code op uit de repository
             }
         }
         stage('Build artifact') {
             steps {
-                sh 'docker build -t devops-pe/calculator-app:latest .'
+                sh 'docker build -t devops-pe/calculator-app:latest .'  // Bouw de Docker image en tag deze als 'latest'
             }
         }
-        stage('Push Artifact') {
+        stage('Login to DockerHub') {
             steps {
                 script {
-                    // Gebruik 'withCredentials' om de Docker Hub inloggegevens veilig te verwerken
+                    // Gebruik 'withCredentials' om Docker Hub login gegevens veilig te verwerken
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
+                        // Docker login met de credentials uit de Jenkins credentials store
                         sh 'echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin'
-                        sh 'docker push devops-pe/calculator-app:latest'
                     }
                 }
+            }
+        }
+        stage('Push Artifact to DockerHub') {
+            steps {
+                sh 'docker push devops-pe/calculator-app:latest'  // Push de image naar je DockerHub repository
             }
         }
     }
     post {
         always {
-            sh 'docker logout'
+            sh 'docker logout'  // Zorg ervoor dat je uitlogt van DockerHub na elke run
         }
     }
 }
