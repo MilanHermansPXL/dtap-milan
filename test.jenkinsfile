@@ -14,15 +14,15 @@ pipeline {
                 sh "npm install express"
             }
         }
-        stage('Build artifact'){
-            steps{
-                sh 'docker build -t calculator-app .'         
-            }
-        }
         stage('fetch app code') {
             steps {
                 // Get some code from a GitHub repository
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+            }
+        }
+        stage('Build artifact'){
+            steps{
+                sh 'docker build -t calculator-app .'         
             }
         }
     }
