@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage ('cleanup'){
             steps{
-                echo 'hallo'
+                deleteDir()
             }
         }
         stage('Install dependencies'){
@@ -16,6 +16,7 @@ pipeline {
         }
         stage('Build artifact'){
             steps{
+                echo 'hallo'
                 //TODO
             }
         }
