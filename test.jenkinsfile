@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage ('cleanup'){
             steps{
-                deleteDir()
+                echo 'hallo'
             }
         }
         stage('Install dependencies'){
