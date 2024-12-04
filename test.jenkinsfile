@@ -23,7 +23,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
                         sh 'docker build -t $DOCKERHUB_USR/calculator-app:latest .'
-                        echo 'docker images'
+                        sh 'docker images'
                     }
             }
         }
