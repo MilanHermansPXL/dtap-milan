@@ -22,7 +22,7 @@ pipeline {
         stage('Build artifact') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
-                    sh 'docker build -t $DOCKERHUB_USR/devops-pe .'
+                    sh 'docker build -t devops-pe/calculator .'
                 }
             }
         }
@@ -31,7 +31,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
                     script {
                         sh "docker login -u \"$DOCKERHUB_USR\" -p \"$DOCKERHUB_PSW\" docker.io"
-                        sh "docker push $DOCKERHUB_USR/devops-pe"
+                        sh "docker push devops-pe/calculator"
                     }
                 }
             }
