@@ -21,7 +21,14 @@ pipeline {
         }
         stage('Build artifact') {
             steps {
-                sh 'docker build -t devops-pe/calculator-app:latest .'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
+                        sh 'docker build -t $DOCKERHUB_USR/calculator-app:latest .'
+                    }
+            }
+        }
+        stage('Push artifact'){
+            steps{
+
             }
         }
     }
