@@ -16,12 +16,12 @@ pipeline {
         }
         stage('Fetch app code') {
             steps {
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'  // Clone the repository
+                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
         }
         stage('Build artifact') {
             steps {
-                sh 'docker build -t devops-pe/calculator-app:latest .'  // Build the Docker image with the correct tag
+                sh 'docker build -t devops-pe/calculator-app:latest .'
             }
         }
         stage('Push Artifact to DockerHub') {
@@ -30,6 +30,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
                         // Login to DockerHub and push the image
                         sh '''
+                            docker logout
                             echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin
                             docker push devops-pe/calculator-app:latest
                         '''
