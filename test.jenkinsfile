@@ -11,12 +11,12 @@ pipeline {
         }
         stage('Install dependencies'){
             steps{
-                sh "npm install express"
+                sh "npm install"
             }
         }
         stage('Build artifact'){
             steps{
-                echo 'hallo'
+                sh 'docker build -t calculator-app .'
                 //TODO
             }
         }
