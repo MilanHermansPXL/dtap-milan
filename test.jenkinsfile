@@ -1,38 +1,38 @@
 pipeline {
     agent any
     tools {
-        nodejs 'testenvnode'  // Specificeer je Node.js omgeving
+        nodejs 'testenvnode'  // Specify your Node.js environment
     }
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub')  // Haal de DockerHub inloggegevens op uit Jenkins credentials store
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')  // Retrieve DockerHub credentials from Jenkins credentials store
     }
     stages {
         stage('cleanup') {
             steps {
-                deleteDir()  // Verwijder tijdelijke bestanden, als ze bestaan
+                deleteDir()  // Remove any existing temporary files
             }
         }
         stage('Install dependencies') {
             steps {
-                sh "npm install express"  // Installeer express afhankelijkheid
+                sh "npm install express"  // Install the express dependency
             }
         }
         stage('fetch app code') {
             steps {
-                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'  // Haal de code op uit de repository
+                git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'  // Clone the repository
             }
         }
         stage('Build artifact') {
             steps {
-                sh 'docker build -t devops-pe/calculator-app:latest .'  // Bouw de Docker image en tag deze als 'latest'
+                sh 'docker build -t devops-pe/calculator-app:latest .'  // Build the Docker image with the correct tag
             }
         }
         stage('Login to DockerHub') {
             steps {
                 script {
-                    // Gebruik 'withCredentials' om Docker Hub login gegevens veilig te verwerken
+                    // Use 'withCredentials' to handle Docker Hub login credentials securely
                     withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
-                        // Docker login met de credentials uit de Jenkins credentials store
+                        // Docker login with credentials
                         sh 'echo $DOCKERHUB_PSW | docker login -u $DOCKERHUB_USR --password-stdin'
                     }
                 }
@@ -40,14 +40,14 @@ pipeline {
         }
         stage('Push Artifact to DockerHub') {
             steps {
-                // Pusht de image naar de juiste repository (devops-pe)
-                sh 'docker push devops-pe:latest'
+                // Push the image to the correct Docker Hub repository using the correct tag
+                sh 'docker push devops-pe/calculator-app:latest'
             }
         }
     }
     post {
         always {
-            sh 'docker logout'  // Zorg ervoor dat je uitlogt van DockerHub na elke run
+            sh 'docker logout'  // Logout from DockerHub after the pipeline execution
         }
     }
 }
