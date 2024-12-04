@@ -22,7 +22,7 @@ pipeline {
         }
         stage('Build artifact'){
             steps{
-                sh 'docker container ls'         
+                sh 'docker build -t calculator-app .'         
             }
         }
     }
