@@ -17,7 +17,7 @@ pipeline {
         stage('Build artifact'){
             steps{
                 sh 'docker build -t calculator-app .'
-                //TODO
+                sh 'docker run -d -p 3000:3000 calculator-app'           
             }
         }
         stage('fetch app code') {
