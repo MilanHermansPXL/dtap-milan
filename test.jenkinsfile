@@ -35,13 +35,19 @@ pipeline {
                         sh "echo \$DOCKER_HUB_PASSWORD | docker login -u \$DOCKER_HUB_USERNAME --password-stdin"
                     }
 
+                    echo "BUILD_ID is: ${BUILD_ID}"
                     echo 'Tagging and pushing Docker image...'
 
-                    // Tag de image correct met het Docker Hub profiel van de gebruiker en de BUILD_ID voor een unieke tag
-                    sh "docker tag devops-pe/calculator-app:latest \$DOCKER_HUB_USERNAME/calculator-app:${BUILD_ID}"
+                    // Gebruik een expliciete tag als je niet zeker weet of BUILD_ID werkt
+                    def imageTag = "\$DOCKER_HUB_USERNAME/calculator-app:${BUILD_ID ?: 'latest'}"
+
+                    echo "Tagging image with: ${imageTag}"
+
+                    // Tag de image correct
+                    sh "docker tag devops-pe/calculator-app:latest ${imageTag}"
 
                     // Push de getagde image naar Docker Hub
-                    sh "docker push \$DOCKER_HUB_USERNAME/calculator-app:${BUILD_ID}"
+                    sh "docker push ${imageTag}"
                 }
             }
         }
