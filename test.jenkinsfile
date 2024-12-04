@@ -31,17 +31,21 @@ pipeline {
 
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_HUB_USERNAME', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
                         
+                        // Logging into Docker Hub
                         sh "echo \$DOCKER_HUB_PASSWORD | docker login -u \$DOCKER_HUB_USERNAME --password-stdin"
                     }
 
                     echo 'Tagging Docker image...'
 
+                    // Tag the image using the Docker Hub username
                     def imageTag = "${DOCKER_HUB_USERNAME}/calculator-app:latest"
                     echo "Tagging image with: ${imageTag}"
 
+                    // Tag the image for pushing
                     sh "docker tag devops-pe/calculator-app:latest ${imageTag}"
 
                     echo 'Pushing Docker image to Docker Hub...'
+                    // Push the tagged image
                     sh "docker push ${imageTag}"
                 }
             }
