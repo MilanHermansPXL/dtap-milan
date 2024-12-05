@@ -3,10 +3,6 @@ pipeline {
     tools {
         nodejs 'testenvnode'
     }
-    environment {
-        DOCKERHUB_USR = ''
-        DOCKERHUB_PSW = ''
-    }
     stages {
         stage('Cleanup') {
             steps {
@@ -25,13 +21,14 @@ pipeline {
         }
         stage('Build artifact') {
             steps {
-                // Haal de Docker Hub-credentials op uit Jenkins Credential Manager
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
+                // Haal DockerHub-credentials op uit de Jenkins Credential Manager
+                withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
                     script {
-                        // Sla de credentials op in omgevingsvariabelen
+                        // Stel de omgevingsvariabelen in
                         env.DOCKERHUB_USR = DOCKERHUB_USR
                         env.DOCKERHUB_PSW = DOCKERHUB_PSW
                     }
+                    // Bouw de Docker image
                     sh 'docker build -t $DOCKERHUB_USR/devops-pe .'
                 }
             }
@@ -39,9 +36,13 @@ pipeline {
         stage('Push artifact') {
             steps {
                 script {
-                    // Docker login met veilige verwerking van wachtwoord
-                    sh "echo \"$DOCKERHUB_PSW\" | docker login -u \"$DOCKERHUB_USR\" --password-stdin docker.io"
+                    // Login op Docker Hub zonder wachtwoord in de logs
+                    sh """
+                    echo \$DOCKERHUB_PSW | docker login -u \$DOCKERHUB_USR --password-stdin docker.io
+                    """
+                    // Push de Docker image naar Docker Hub
                     sh "docker push $DOCKERHUB_USR/devops-pe"
+                    // Verwijder de lokale Docker image
                     sh "docker rmi $DOCKERHUB_USR/devops-pe"
                 }
             }
@@ -49,7 +50,7 @@ pipeline {
     }
     post {
         always {
-            // Zorg ervoor dat je altijd uitlogt van Docker na gebruik
+            // Zorg ervoor dat je uitlogt van Docker na de pipeline
             sh 'docker logout'
         }
     }
