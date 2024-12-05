@@ -22,7 +22,7 @@ pipeline {
         stage('Build artifact') {
             steps {
                 // Haal DockerHub-credentials op uit de Jenkins Credential Manager
-                withCredentials([usernamePassword(credentialsId: 'docker', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
                     script {
                         // Stel de omgevingsvariabelen in
                         env.DOCKERHUB_USR = DOCKERHUB_USR
