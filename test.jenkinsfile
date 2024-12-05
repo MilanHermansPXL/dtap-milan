@@ -3,6 +3,10 @@ pipeline {
     tools {
         nodejs 'testenvnode'
     }
+    environment {
+        DOCKERHUB_USR = ''
+        DOCKERHUB_PSW = ''
+    }
     stages {
         stage('Cleanup') {
             steps {
@@ -21,24 +25,31 @@ pipeline {
         }
         stage('Build artifact') {
             steps {
+                // Haal de Docker Hub-credentials op uit Jenkins Credential Manager
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
+                    script {
+                        // Sla de credentials op in omgevingsvariabelen
+                        env.DOCKERHUB_USR = DOCKERHUB_USR
+                        env.DOCKERHUB_PSW = DOCKERHUB_PSW
+                    }
                     sh 'docker build -t $DOCKERHUB_USR/devops-pe .'
                 }
             }
         }
-        stage('Push artifact'){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKERHUB_PSW', usernameVariable: 'DOCKERHUB_USR')]) {
-                    script {
-                        sh "echo \"$DOCKERHUB_PSW\" | docker login -u \"$DOCKERHUB_USR\" --password-stdin docker.io"
-                        sh "docker push $DOCKERHUB_USR/devops-pe"
-                    }
+        stage('Push artifact') {
+            steps {
+                script {
+                    // Docker login met veilige verwerking van wachtwoord
+                    sh "echo \"$DOCKERHUB_PSW\" | docker login -u \"$DOCKERHUB_USR\" --password-stdin docker.io"
+                    sh "docker push $DOCKERHUB_USR/devops-pe"
+                    sh "docker rmi $DOCKERHUB_USR/devops-pe"
                 }
             }
         }
     }
     post {
         always {
+            // Zorg ervoor dat je altijd uitlogt van Docker na gebruik
             sh 'docker logout'
         }
     }
